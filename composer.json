@@ -1,0 +1,38 @@
+{
+    "name": "smochin/openstreetmap-php-client",
+    "description": "A simple PHP Client for openstreetmap.org",
+    "type": "library",
+    "homepage": "https://github.com/smochin/openstreetmap-php-client",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Jamerson Silva",
+            "email": "jamersonweb@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "keywords": [
+        "php",
+        "openstreetmap",
+        "http",
+        "client"
+    ],
+    "require": {
+        "php": ">=7.0",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^6.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Smochin\\OpenStreetMap\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Smochin\\OpenStreetMap\\": "test/"
+        }
+    }
+}

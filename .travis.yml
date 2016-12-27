@@ -1,0 +1,13 @@
+language: php
+sudo: false
+
+php:
+  - 7.0
+  - 7.1
+
+before_script:
+  - composer install --prefer-dist -o
+  - phpenv config-rm xdebug.ini || echo "xdebug not available"
+
+script:
+  - ./vendor/bin/phpunit
