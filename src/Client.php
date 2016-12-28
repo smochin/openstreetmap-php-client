@@ -7,6 +7,7 @@ namespace Smochin\OpenStreetMap;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Promise\PromiseInterface;
 use Smochin\OpenStreetMap\Exception\UnableToGeocodeException;
 use Smochin\OpenStreetMap\Factory\AddressFactory;
 use Smochin\OpenStreetMap\ValueObject\Address;
@@ -23,7 +24,9 @@ class Client
 
     public function __construct()
     {
-        $this->client = new HttpClient(['base_uri' => self::BASE_URI]);
+        $this->client = new HttpClient([
+            'base_uri' => self::BASE_URI,
+        ]);
     }
 
     /**
@@ -38,24 +41,31 @@ class Client
     public function reverse(float $latitude, float $longitude): Address
     {
         $response = $this->client->request('GET', self::REVERSE_ENDPOINT, [
-            'query' => [
-                'lat' => $latitude,
-                'lon' => $longitude,
-                'format' => 'json',
-                'zoom' => 18,
-                'addressdetails' => 1,
-            ],
+            'query' => ['lat' => $latitude, 'lon' => $longitude],
         ]);
-        $body = json_decode($response->getBody()->getContents(), true);
-        if (array_key_exists('error', $body)) {
-            throw new UnableToGeocodeException($body['error']);
+        $body = simplexml_load_string($response->getBody()->getContents());
+        if (property_exists($body, 'error')) {
+            throw new UnableToGeocodeException((string) $body->error);
         }
 
         return AddressFactory::create(
-            $body['address']['city'],
-            $body['address']['state'],
-            $body['address']['country'],
-            $body['address']['country_code']
+            (string) $body->addressparts->city,
+            (string) $body->addressparts->state,
+            (string) $body->addressparts->country,
+            (string) $body->addressparts->country_code
         );
+    }
+
+    /**
+     * @param float $latitude
+     * @param float $longitude
+     *
+     * @return PromiseInterface
+     */
+    public function reverseAsync(float $latitude, float $longitude): PromiseInterface
+    {
+        return $this->client->requestAsync('GET', self::REVERSE_ENDPOINT, [
+            'query' => ['lat' => $latitude, 'lon' => $longitude],
+        ]);
     }
 }

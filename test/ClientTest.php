@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Smochin\OpenStreetMap;
 
 use Smochin\OpenStreetMap\ValueObject\Address;
+use GuzzleHttp\Promise\PromiseInterface;
 
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,5 +42,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     public function testGuzzleException()
     {
         $this->client->reverse(66666666666666666, 666666666666666666);
+    }
+
+    public function testReverseAsync()
+    {
+        $promise = $this->client->reverseAsync(-8.047562, -34.876964);
+        $this->assertInstanceOf(PromiseInterface::class, $promise);
     }
 }
