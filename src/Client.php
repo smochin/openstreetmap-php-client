@@ -8,8 +8,8 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
 use Smochin\OpenStreetMap\Exception\UnableToGeocodeException;
+use Smochin\OpenStreetMap\Factory\AddressFactory;
 use Smochin\OpenStreetMap\ValueObject\Address;
-use Smochin\OpenStreetMap\ValueObject\Country;
 
 class Client
 {
@@ -51,20 +51,11 @@ class Client
             throw new UnableToGeocodeException($body['error']);
         }
 
-        return $this->loadAddress($body['address']);
-    }
-
-    /**
-     * @param array $address
-     *
-     * @return Address
-     */
-    public function loadAddress(array $address): Address
-    {
-        return new Address(
-            $address['city'],
-            $address['state'],
-            new Country($address['country'], $address['country_code'])
+        return AddressFactory::create(
+            $body['address']['city'],
+            $body['address']['state'],
+            $body['address']['country'],
+            $body['address']['country_code']
         );
     }
 }
